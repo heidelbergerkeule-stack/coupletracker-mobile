@@ -1,0 +1,25 @@
+{
+  "name": "coupletracker",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "start": "react-native start"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-native": "0.73.2",
+    "@react-navigation/native": "^6.1.9",
+    "@react-navigation/bottom-tabs": "^6.5.11",
+    "react-native-maps": "^1.10.0",
+    "react-native-geolocation-service": "^5.3.1",
+    "@react-native-firebase/app": "^19.0.0",
+    "@react-native-firebase/database": "^19.0.0",
+    "@react-native-firebase/messaging": "^19.0.0",
+    "react-native-permissions": "^4.0.3",
+    "@notifee/react-native": "^7.8.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
