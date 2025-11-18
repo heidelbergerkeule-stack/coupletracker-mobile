@@ -1,0 +1,87 @@
+name: React Native Android Build & Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Build environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+          - development
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'apk'
+        type: choice
+        options:
+          - apk
+          - aab
+  push:
+    branches:
+      - main
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📱 Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🔧 Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 🏗️ Build Android APK (Debug)
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon
+        env:
+          ENVIRONMENT: ${{ inputs.environment || 'production' }}
+
+      - name: 📤 Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      - name: ✅ Build Summary
+        run: |
+          echo "🚀 React Native Android Build completed!"
+          echo "📦 Repository: ${{ github.repository }}"
+          echo "🌿 Branch: ${{ github.ref_name }}"
+          echo "📝 Commit: ${{ github.sha }}"
+          echo "🏷️ Environment: ${{ inputs.environment || 'production' }}"
+          echo "📱 Build Type: ${{ inputs.build_type || 'apk' }}"
+          echo ""
+          echo "📥 Download your APK from the Artifacts section above!"
+          echo "🔗 Or check: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
